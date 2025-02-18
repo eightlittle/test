@@ -26,21 +26,38 @@ plt.legend(loc='upper right')
 plt.grid(True, linestyle='--', alpha=0.7)
 plt.show()
 
-# gap fill method (interpolation)
-def interpolate_with_fallback(data):
+# Gap fill method (interpolation) using polynomial interpolation as fallback
+def interpolate_with_cubic(data):
     data = pd.DataFrame(data)
     data.replace(0, np.nan, inplace=True)
     data = data.interpolate(method='linear', axis=0)
-    data.fillna(method='bfill', inplace=True)  
-    data.fillna(method='ffill', inplace=True)  
+    data.bfill(inplace=True)  # 使用新的 bfill 方法
+    data.ffill(inplace=True)  # 使用新的 ffill 方法
     if data.isnull().values.any() or (data == 0).any().any():
-        data = data.interpolate(method='polynomial', order=2, axis=0).fillna(method='bfill').fillna(method='ffill')
+        # 使用 cubic interpolation 並套用新的 bfill 和 ffill
+        data = data.interpolate(method='polynomial', axis=0).bfill().ffill()
     return data.values
 
-# apply for the data
-gap_fill_club_x = interpolate_with_fallback(club_x)
-gap_fill_club_y = interpolate_with_fallback(club_y)
-gap_fill_club_z = interpolate_with_fallback(club_z)
+# Gap fill method (interpolation) using cubic interpolation as fallback
+def interpolate_with_cubic(data):
+    data = pd.DataFrame(data)
+    data.replace(0, np.nan, inplace=True)
+    data = data.interpolate(method='linear', axis=0)
+    data.bfill(inplace=True)  # 使用新的 bfill 方法
+    data.ffill(inplace=True)  # 使用新的 ffill 方法
+    if data.isnull().values.any() or (data == 0).any().any():
+        # 使用 cubic interpolation 並套用新的 bfill 和 ffill
+        data = data.interpolate(method='cubic', axis=0).bfill().ffill()
+    return data.values
+
+# apply for the data - test 
+gap_fill_club_x = interpolate_with_polynomial(club_x)
+gap_fill_club_y = interpolate_with_polynomial(club_y)
+gap_fill_club_z = interpolate_with_polynomial(club_z)
+
+gap_fill_club_x = interpolate_with_cubic(club_x)
+gap_fill_club_y = interpolate_with_cubic(club_y)
+gap_fill_club_z = interpolate_with_cubic(club_z)
 
 # show the picture after gap filling 
 plt.figure(figsize=(8, 6), dpi=300)

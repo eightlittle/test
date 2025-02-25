@@ -28,24 +28,27 @@ def butterworth_filter(data, cutoff, fs, order=4, filter_type='low'):
 
 # make velocity (you can ignore here)
 def time_d(data, sampling_interval):
-    length = len(data)
-    velocity = np.zeros(length)
+    velocity = np.zeros_like(data)
+    length = data.shape[0]
+
     for i in range(length):
         if i == 0 or i == length - 1:
-            velocity[i] = 0
+            velocity[i, :] = 0
         else:
-            velocity[i] = (data[i + 1] - data[i - 1]) / (2 * sampling_interval)
+            velocity[i, :] = (data[i + 1, :] - data[i - 1, :]) / (2 * sampling_interval)
     return velocity
 
-# make acceleration (you can ignore here)
+
+# 計算加速度 (支援多維資料)
 def time_dd(data, sampling_interval):
-    length = len(data)
-    acceleration = np.zeros(length)
+    acceleration = np.zeros_like(data)
+    length = data.shape[0]
+
     for i in range(length):
         if i == 0 or i == length - 1:
-            acceleration[i] = 0
+            acceleration[i, :] = 0
         else:
-            acceleration[i] = (data[i + 1] - 2 * data[i] + data[i - 1]) / (sampling_interval ** 2)
+            acceleration[i, :] = (data[i + 1, :] - 2 * data[i, :] + data[i - 1, :]) / (sampling_interval ** 2)
     return acceleration
 
 # do whole process of filtering velocity, and acceleration (you can ignore here)
